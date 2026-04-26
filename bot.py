@@ -74,39 +74,24 @@ class FloridaRPBot(commands.Bot):
         logging.info("Logged in as %s (%s)", self.user, self.user.id)
         logging.info("Connected to guild %s", self.config["guild_id"])
 
-    async def on_raw_message_create(self, payload: discord.RawMessageCreateEvent) -> None:
-        if not payload.webhook_id:
-            return
-        embeds = payload.data.get('embeds', [])
-        if not embeds:
-            return
-        if payload.data.get('components'):
-            return
-        title = embeds[0].get('title')
-        if title not in {'Moderator Application Submission', 'New Moderator Application'}:
-            return
-
-        try:
-            channel = self.get_channel(payload.channel_id)
-            if channel is None:
-                channel = await self.fetch_channel(payload.channel_id)
-            if channel is None:
-                return
-            embed = discord.Embed.from_dict(embeds[0])
-            view = discord.ui.View(timeout=None)
-            view.add_item(discord.ui.Button(label='Accept', style=discord.ButtonStyle.success, custom_id='app_accept'))
-            view.add_item(discord.ui.Button(label='Deny', style=discord.ButtonStyle.danger, custom_id='app_deny'))
-            await channel.send(embed=embed, view=view)
-            try:
-                message = await channel.fetch_message(payload.message_id)
-                await message.delete()
-            except Exception:
-                pass
-        except Exception as exc:
-            logging.exception('Failed to repost webhook embed with buttons in raw event: %s', exc)
-
     async def on_message(self, message):
         if message.webhook_id:
+            # Handle webhook messages that are moderator application submissions
+            if message.embeds and not message.components:
+                title = message.embeds[0].title
+                if title in {'Moderator Application Submission', 'New Moderator Application'}:
+                    try:
+                        embed = message.embeds[0]
+                        view = discord.ui.View(timeout=None)
+                        view.add_item(discord.ui.Button(label='Accept', style=discord.ButtonStyle.success, custom_id='app_accept'))
+                        view.add_item(discord.ui.Button(label='Deny', style=discord.ButtonStyle.danger, custom_id='app_deny'))
+                        await message.channel.send(embed=embed, view=view)
+                        try:
+                            await message.delete()
+                        except Exception:
+                            pass
+                    except Exception as exc:
+                        logging.exception('Failed to repost webhook embed with buttons: %s', exc)
             return
         if message.author.bot:
             return
