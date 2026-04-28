@@ -6,14 +6,25 @@
     <title>Moderator Application</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        body {
+            background: linear-gradient(135deg, #0A0F1C 0%, #1A2338 50%, #0F172A 100%);
+            min-height: 100vh;
+        }
+        
         .card {
-            background: white;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(0, 255, 170, 0.3);
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 20px #00FFAA, 0 0 40px #00CCFF;
+            backdrop-filter: blur(10px);
         }
         
         .fading-green {
-            color: #10b981;
+            background: linear-gradient(90deg, #00FFAA, #00CCFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 10px #00FFAA, 0 0 30px #00CCFF;
         }
         
         button:disabled {
@@ -26,9 +37,28 @@
             font-size: 14px;
             margin-top: 4px;
         }
+        
+        input, textarea, select {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(0, 255, 170, 0.3);
+            color: white;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: #00FFAA;
+            box-shadow: 0 0 10px #00FFAA;
+        }
+        
+        label {
+            color: #00CCFF;
+        }
+        
+        p {
+            color: #e2e8f0;
+        }
     </style>
 </head>
-<body class="bg-gray-50">
+<body>
     <div class="min-h-screen py-12 px-4">
         <div class="max-w-4xl mx-auto">
             <!-- Header -->
