@@ -325,7 +325,8 @@
             if (!rushAgreement.checked) missingFields.push('Rush Agreement');
 
             if (missingFields.length > 0) {
-                showError(`Please fill in the following required fields: ${missingFields.join(', ')}`);
+                const detailedMissing = missingFields.map(field => `${field} - please go back and fill it`).join(', ');
+                showError(`The following fields are not filled: ${detailedMissing}`);
                 return;
             }
 
