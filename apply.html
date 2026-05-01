@@ -242,8 +242,37 @@
     </script>
 
     <script>
-        // Railway Bot Configuration
-        const API_URL = 'https://mojad-bot-production-3ef2.up.railway.app/apply';
+        // Application API endpoints
+        const API_URLS = [
+            'https://mojad-bot-production-3ef2.up.railway.app/apply',
+            'http://localhost:8080/apply'
+        ];
+
+        async function resolveApiUrl() {
+            if (window.location.protocol === 'file:') {
+                return API_URLS[1];
+            }
+
+            for (const url of API_URLS) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'OPTIONS',
+                        mode: 'cors',
+                        cache: 'no-cache',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    if (response.ok || response.status === 204) {
+                        return url;
+                    }
+                } catch (error) {
+                    // try next endpoint
+                }
+            }
+
+            return null;
+        }
 
         let currentPage = 0;
         const pages = ['personal', 'knowledge', 'scenario', 'agreement', 'additional', 'submit'];
@@ -395,9 +424,19 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting...';
 
+            const API_URL = await resolveApiUrl();
+            if (!API_URL) {
+                showError('No application backend is reachable. Please try again later.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                return;
+            }
+
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
+                    mode: 'cors',
+                    cache: 'no-cache',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -442,5 +481,6 @@
     </script>
 </body>
 </html>
-< ! - -   c a c h e   b u s t   - - >  
+< ! - -   c a c h e   b u s t   - - > 
+ 
  
